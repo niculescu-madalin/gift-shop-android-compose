@@ -1,4 +1,4 @@
-package com.example.giftshop
+package com.example.giftshop.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.giftshop.data.NavigationItems
 
 @Composable
 fun BottomNavigationBar(
