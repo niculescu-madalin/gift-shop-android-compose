@@ -20,5 +20,5 @@ fun ProductPage(
 @Preview(showBackground = true)
 @Composable
 fun ProductPagePreview() {
-    HomePage()
+    ProductPage()
 }
