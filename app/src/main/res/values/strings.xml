@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GiftShop</string>
+    <string name="bottom_navigation_home">Home</string>
+    <string name="bottom_navigation_products">Products</string>
+    <string name="bottom_navigation_cart">Cart</string>
+    <string name="bottom_navigation_profile">Profile</string>
+</resources>

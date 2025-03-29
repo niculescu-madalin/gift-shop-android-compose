@@ -1,0 +1,19 @@
+package com.example.giftshop
+
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+
+@Composable
+fun CartPage(
+    modifier: Modifier = Modifier
+) {
+    Text(text = "Cart Page")
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CartPagePreview() {
+    CartPage()
+}
