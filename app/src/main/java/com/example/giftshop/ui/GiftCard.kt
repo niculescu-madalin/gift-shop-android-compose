@@ -1,6 +1,7 @@
 package com.example.giftshop.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -24,11 +25,15 @@ import com.example.giftshop.R
 import com.example.giftshop.data.Gift
 
 @Composable
-fun GiftCard(gift: Gift) {
+fun GiftCard(
+    gift: Gift,
+    onGiftClick: (Gift) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onGiftClick(gift) },
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -54,5 +59,8 @@ fun GiftCard(gift: Gift) {
 @Preview(showBackground = true)
 @Composable
 fun GiftCardPreview() {
-    GiftCard(gift = Gift(1, "Generic Gift", 24.99, R.drawable.gift_generic))
+    GiftCard(
+        gift = Gift(1, "Generic Gift", 24.99, R.drawable.gift_generic),
+        onGiftClick = {}
+    )
 }

@@ -16,7 +16,8 @@ import com.example.giftshop.data.Gift
 
 @Composable
 fun HomePage(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onGiftClick: (Gift) -> Unit
 ) {
     val gifts = listOf(
         Gift(1, "Gift 1", 24.99, R.drawable.gift_generic),
@@ -36,7 +37,7 @@ fun HomePage(
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between columns
     ) {
         items(gifts) { gift ->
-            GiftCard(gift = gift)
+            GiftCard(gift = gift, onGiftClick = onGiftClick)
         }
     }
 }
@@ -44,5 +45,5 @@ fun HomePage(
 @Preview(showBackground = true)
 @Composable
 fun HomePagePreview() {
-    HomePage()
+    HomePage(onGiftClick = {})
 }
