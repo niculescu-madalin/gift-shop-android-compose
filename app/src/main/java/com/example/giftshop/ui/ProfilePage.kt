@@ -1,4 +1,4 @@
-package com.example.giftshop
+package com.example.giftshop.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text

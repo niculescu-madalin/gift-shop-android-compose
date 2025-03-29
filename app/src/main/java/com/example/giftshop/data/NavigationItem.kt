@@ -1,4 +1,4 @@
-package com.example.giftshop
+package com.example.giftshop.data
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.Icons
@@ -8,8 +8,8 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Menu
 
 data class NavigationItem(
     val title: String,
@@ -25,14 +25,14 @@ object NavigationItems {
             unselectedIcon = Icons.Outlined.Home,
         ),
         NavigationItem(
-            title = "Products",
-            selectedIcon = Icons.Filled.List,
-            unselectedIcon = Icons.Outlined.List,
-        ),
-        NavigationItem(
             title = "Cart",
             selectedIcon = Icons.Filled.ShoppingCart,
             unselectedIcon = Icons.Outlined.ShoppingCart,
+        ),
+        NavigationItem(
+            title = "Orders",
+            selectedIcon = Icons.Filled.Menu,
+            unselectedIcon = Icons.Outlined.Menu,
         ),
         NavigationItem(
             title = "Profile",

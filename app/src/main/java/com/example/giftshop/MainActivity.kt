@@ -15,6 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.giftshop.ui.BottomNavigationBar
+import com.example.giftshop.ui.CartPage
+import com.example.giftshop.ui.HomePage
+import com.example.giftshop.ui.OrdersPage
+import com.example.giftshop.ui.ProfilePage
 import com.example.giftshop.ui.theme.GiftShopTheme
 
 class MainActivity : ComponentActivity() {
