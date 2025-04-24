@@ -3,63 +3,76 @@ package com.example.giftshop.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.giftshop.R
-import com.example.giftshop.data.Gift
+import androidx.navigation.NavController
+import com.example.giftshop.data.Cart
+import com.example.giftshop.data.sampleGifts
 
-/* Page for a single Product  */
 @Composable
-fun ProductPage(
-    modifier: Modifier = Modifier,
-    gift: Gift = Gift(1, "Gift 1", 24.99, R.drawable.gift_generic)
-) {
+fun ProductPage(navController: NavController, giftId: Int, modifier: Modifier = Modifier) {
+    val gift = sampleGifts.find { it.id == giftId }
+
+    if (gift == null) {
+        Text("Product not found")
+        return
+    }
+
     Column(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = gift.imageId),
-            contentDescription = gift.name,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.padding(16.dp))
-        Text(
-            text = gift.name,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.padding(8.dp))
-        Text(
-            text = "$${gift.price}",
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Spacer(modifier = Modifier.padding(24.dp))
-        Button(onClick = { /*TODO*/ }) {
-            Text(text = "Add to Cart")
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+            }
+            Spacer(modifier = Modifier.weight(1f))
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.weight(1f)
+        ) {
+            Image(
+                painter = painterResource(id = gift.imageId),
+                contentDescription = gift.name,
+                modifier = Modifier.size(200.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = gift.name,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(text = "$${gift.price}", style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(32.dp))
+            Button(onClick = {
+                Cart.addItem(gift)
+            }) {
+                Text("Add to Cart")
+            }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProductPagePreview() {
-    ProductPage()
 }
