@@ -1,5 +1,16 @@
 package com.example.giftshop.ui
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,23 +34,120 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.giftshop.NotificationHelper
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.example.giftshop.MainActivity
+import com.example.giftshop.R
 import com.example.giftshop.data.Cart
 import com.example.giftshop.data.CartItem
 import com.example.giftshop.data.Order
 import com.example.giftshop.data.OrderRepository
 import java.text.DecimalFormat
 
+object SimpleNotificationHelper {
+
+    private const val CHANNEL_ID = "simple_notification_channel"
+    private const val NOTIFICATION_ID = 100
+    private const val TAG = "SimpleNotificationHelper"
+
+    fun createNotificationChannel(context: Context) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Simple Notification Channel"
+            val descriptionText = "Channel for simple notifications"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                this.description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    fun showSimpleNotification(context: Context, message: String) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.e(TAG, "Notification permission not granted")
+            // In a real app you could show a user-facing message here.
+            return
+        }
+
+        // Create an explicit intent for an Activity in your app
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent: PendingIntent =
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your own icon!
+            .setContentTitle("Thank you for your purchase!")
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            // Set the intent that will fire when the user taps the notification
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        try {
+            with(NotificationManagerCompat.from(context)) {
+                // notificationId is a unique int for each notification that you must define
+                notify(NOTIFICATION_ID, builder.build())
+            }
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Failed to send notification: ${e.message}")
+            // Handle the exception here, maybe tell the user that notifications aren't enabled.
+        }
+    }
+}
+
 @Composable
 fun CartPage(modifier: Modifier = Modifier) {
     val cartItems = Cart.items
     val context = LocalContext.current
+    var hasNotificationPermission by remember { mutableStateOf(false) }
+
+    // Request permission
+    val requestPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            hasNotificationPermission = isGranted
+        }
+
+    // Check permission and ask if necessary
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                hasNotificationPermission = true
+            }
+        } else {
+            hasNotificationPermission = true
+        }
+    }
+    //ensure notification channel is created
+    SimpleNotificationHelper.createNotificationChannel(context)
 
     Column(
         modifier = modifier.padding(16.dp)
@@ -69,13 +177,22 @@ fun CartPage(modifier: Modifier = Modifier) {
 
         Button(
             onClick = {
-                // Simulate checkout. We create an order for now.
-                val newOrder = Order(
-                    items = Cart.items.toList(),
-                    totalPrice = Cart.items.sumOf { it.gift.price * it.quantity })
-                OrderRepository.addOrder(newOrder)
-                Cart.clear()
-                NotificationHelper.sendOrderNotification(context, newOrder.id)
+                if (hasNotificationPermission) {
+                    // Simulate checkout. We create an order for now.
+                    val newOrder = Order(
+                        items = Cart.items.toList(),
+                        totalPrice = Cart.items.sumOf { it.gift.price * it.quantity })
+                    OrderRepository.addOrder(newOrder)
+                    //send order notification passing the correct id
+                    SimpleNotificationHelper.showSimpleNotification(
+                        context,
+                        "Your order id is: ${newOrder.id}"
+                    )
+                    Cart.clear()
+                } else {
+                    Log.e("CartPage", "Notification permission not granted, so the notification was not send")
+
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -9,7 +9,6 @@ import com.example.giftshop.ui.theme.GiftShopTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        NotificationHelper.createNotificationChannel(this)
         setContent {
             GiftShopTheme {
                 GiftShopApp()
